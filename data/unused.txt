@@ -1,0 +1,2 @@
+Just so git will pick up the data subdirectory.
+This file can be removed once we stick another file in it.
