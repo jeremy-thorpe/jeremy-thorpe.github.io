@@ -3,9 +3,11 @@ loadData().then(data => {
     console.log(data);
 
     let map = new Map(data)
+    let minWageChart = new Chart(data.wage);
 
     // here we load the map data
     map.drawMap(data.map);
+    minWageChart.createChart();
 });
 
 async function loadFile(file) {
@@ -27,7 +29,6 @@ async function loadFile(file) {
 async function loadData()
 {
     let wageData = await loadFile("data/min-wage.csv");
-    console.log("wageData", wageData);
     let mapData = await d3.json('data/us_states.json');
 
     return {

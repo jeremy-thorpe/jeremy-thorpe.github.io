@@ -19,7 +19,7 @@
     grid-column: 1;
     grid-row: 2;
     display: grid;
-    grid-template-columns: 1fr 100px 1fr;;
+    grid-template-columns: 1fr 10px 1fr;;
 }
 
 .smallchart1 {
@@ -35,4 +35,12 @@
 .other {
     grid-column: 2;
     grid-row: 2;
+}
+
+.state {
+    fill: white;
+}
+
+.selected {
+    fill: green;
 }
