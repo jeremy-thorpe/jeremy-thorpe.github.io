@@ -3,20 +3,26 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>College Cost Visualization</title>
+    <title>The Rising Cost of College Education</title>
+    <h2>The Rising Cost of College Education</h2>
     <link rel="stylesheet" href="styles.css" />
     <script src="https://d3js.org/d3.v5.js"></script>
+    <script src="js/map.js" async></script>
+    <script src="js/charts.js" async></script>
+    <script src="js/script.js" async></script>
     <link href="https://fonts.googleapis.com/css?family=Work+Sans:400,700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h2>Testing</h2>
     <div class="gridview">
-        <div class="map">Map goes here</div>
-        <div class="wage">Minimum Wage Chart goes here</div>
-        <div class="college">College Tuition Chart goes here</div>
+        <div class="map">U.S. Map
+            <svg id="map-svg"></svg>
+        </div>
+        <div class="bigchart">Main Chart</div>
+        <div class="smallchartarea">
+            <div class="smallchart1">Alternative Chart #1</div>
+            <div class="smallchart2">Alternative Chart #2</div>
+        </div>
+        <div class="other">Storytelling goes here</div>
     </div>
-    <script type="application/javascript" src="js/map.js"></script>
-    <script type="application/javascript" src="js/charts.js"></script>
-    <script type="application/javascript" src="js/script.js"></script>
 </body>
 </html>
