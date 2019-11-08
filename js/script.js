@@ -51,6 +51,13 @@ function swapChart(chartName)
     }
 }
 
+function statesChanged(newStates)
+{
+    mainChart.changeStates(newStates);
+    subChart1.changeStates(newStates);
+    subChart2.changeStates(newStates);
+}
+
 var minimumWageData;
 
 loadData().then(data => {
@@ -58,7 +65,7 @@ loadData().then(data => {
     allData = data;
     console.log(data);
 
-    let map = new Map(data)
+    let map = new Map(data, statesChanged)
     map.drawMap(data.map);
 
     let wage = data.wage;

@@ -6,10 +6,11 @@ class Map {
      *
      * @param data
      */
-    constructor(data) {
+    constructor(data, selectionChanged) {
         this.data = data;
         this.selectedStates = [];
-        this.maxSelectedStates = 1;
+        this.maxSelectedStates = 50;
+        this.selectionChangedCallback = selectionChanged;
     }
 
     drawMap(mapData)
@@ -24,11 +25,14 @@ class Map {
         function mapClicked(data)
         {
             let clickedState = getStateId(data.properties.NAME);
-            if (that.selectedStates.includes(clickedState))
+            if (that.maxSelectedStates === 1)
+            {
+                that.selectedStates = [clickedState];
+            }
+            else if (that.selectedStates.includes(clickedState))
             {
                 that.selectedStates.splice(that.selectedStates.indexOf(clickedState),1);
                 d3.select("#map_" + clickedState).classed("selected", false);
-                console.log("Selected states: ", that.selectedStates);
             }
             else
             {
@@ -36,9 +40,9 @@ class Map {
                 {
                     that.selectedStates.push(clickedState);
                     d3.select("#map_" + clickedState).classed("selected", true);
-                    console.log("Selected states: ", that.selectedStates);
                 }
             }
+            that.selectionChangedCallback(that.selectedStates);
         }
 
         let projScale = 550;

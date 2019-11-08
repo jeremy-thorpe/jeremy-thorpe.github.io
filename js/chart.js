@@ -86,13 +86,14 @@ class Chart {
     changeStates(states)
     {
         this.states = states
+        this.updateChart();
     }
 
     updateChart()
     {
         let that = this;
         let stateData = this.data.filter(function(d){
-            if (d.state === "Federal (FLSA)") return true; // always want federal chart
+            if (that.isFederalData(d)) return true; // always want federal chart
             return that.states.includes(d.state);
         });
 
@@ -104,7 +105,7 @@ class Chart {
         this.chartArea.selectAll('path').data(stateData)
         .join('path')
         .attr('d', d => lineGenerator(d.data))
-        .style('stroke', 'blue')
+        .style('stroke',d => that.isFederalData(d) ? "black" : "blue")
         .style("fill", "none");
 
         // draw line for federal
@@ -115,6 +116,11 @@ class Chart {
     getChartName()
     {
         return this.name;
+    }
+
+    isFederalData(data)
+    {
+        return data.state === "Federal (FLSA)";
     }
 
 }
