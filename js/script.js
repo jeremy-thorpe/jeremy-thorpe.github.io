@@ -8,16 +8,16 @@ var hoursHeader = "Hours Worked";
 
 function getDataByChartName(chartName)
 {
-    return allData.wage; // remove this once cost and hours are ready
-    if (chartName === "Minimum Wage")
+    return minimumWageData; // remove this line once cost and hours are ready
+    if (chartName === wageHeader)
     {
         return allData.wage;
     }
-    else if (chartName === "College Cost")
+    else if (chartName === costHeader)
     {
         return allData.cost;
     }
-    else if (chartName === "Hours Worked")
+    else if (chartName === hoursHeader)
     {
         return allData.hours;
     }
@@ -34,13 +34,13 @@ function swapChart(chartName)
     }
     else if (chartName === subChart1.getChartName())
     {
-        // move current chart to sub-chart1
+        // swap main-chart with sub-chart1
         mainChart.resetChart(chartName, getDataByChartName(chartName));
         subChart1.resetChart(currentChartName, getDataByChartName(currentChartName));
     }
     else if (chartName === subChart2.getChartName())
     {
-        // move current chart to sub-chart2
+        // swap main-chart with sub-chart2
         mainChart.resetChart(chartName, getDataByChartName(chartName));
         subChart2.resetChart(currentChartName, getDataByChartName(currentChartName));
     }
@@ -51,9 +51,7 @@ function swapChart(chartName)
     }
 }
 
-var allData;
-
-
+var minimumWageData;
 
 loadData().then(data => {
 
@@ -62,6 +60,21 @@ loadData().then(data => {
 
     let map = new Map(data)
     map.drawMap(data.map);
+
+    let wage = data.wage;
+    var wage_data = [];
+    console.log(wage);
+    for (let w of wage)
+    {
+        var points = [];
+        for (let i = 1968; i < 2019; ++i)
+        {
+            points.push([i, w[i]]);
+        }
+        var item = {state:w["State"], data:points};
+        wage_data.push(item);
+    }
+    minimumWageData = wage_data;
 
     mainChart.resetChart(hoursHeader, getDataByChartName(hoursHeader));
     subChart1.resetChart(costHeader, getDataByChartName(costHeader));

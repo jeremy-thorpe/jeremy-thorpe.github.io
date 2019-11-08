@@ -13,8 +13,8 @@ class Chart {
         this.swapChartCallback = swapChartCallback;
         this.svg = d3.select("#" + chartId + "-svg");
 
-        this.width = this.chartId === "main-chart" ? 500 : 200;
-        this.height = this.chartId === "main-chart" ? 300 : 125;
+        this.width = +this.svg.attr("width").replace("px", "");
+        this.height = +this.svg.attr("height").replace("px", "");
 
         this.xScale = d3
         .scaleLinear()
@@ -39,7 +39,7 @@ class Chart {
       
         this.yAxis = this.svg.append("g")
         .attr("height", this.height-20)
-        .attr("transform", "translate(25,10)")
+        .attr("transform", "translate(25,25)")
         .call(d3.axisLeft().scale(this.yScale));
 
         this.xAxis.call(d3.axisBottom()
@@ -51,24 +51,65 @@ class Chart {
         this.svg.on("dblclick", function(){
             that.swapChartCallback(that.name)
         });
+
+        this.chartArea = this.svg.append("g")
+        .attr("width", this.width - 25)
+        .attr("height", this.height - 25)
+        .attr("transform", "translate(25, 25)");
+
+        this.states = ["California"];
     }
 
     resetChart(chartName, data)
     {
-        this.data = data;
         this.name = chartName;
 
         // reset title
         this.title.text(chartName);
 
         // reset y axis scale
+        // not sure if we want to derive this or hard-code it based on name
+        this.yScale = d3
+        .scaleLinear()
+        .domain([18, 0])
+        .range([0, this.chartArea.attr("height").replace("px", "") - 30]);
+
+        this.yAxis.call(d3.axisLeft().scale(this.yScale));
 
         // reset data
+        this.data = data;
+
+        // redraw plot
+        this.updateChart();
     }
 
-    updateChart(states)
+    changeStates(states)
     {
+        this.states = states
+    }
 
+    updateChart()
+    {
+        let that = this;
+        let stateData = this.data.filter(function(d){
+            if (d.state === "Federal (FLSA)") return true; // always want federal chart
+            return that.states.includes(d.state);
+        });
+
+        let lineGenerator = d3
+        .line()
+        .x(d => this.xScale(d[0]))
+        .y(d => this.yScale(d[1]));
+         
+        this.chartArea.selectAll('path').data(stateData)
+        .join('path')
+        .attr('d', d => lineGenerator(d.data))
+        .style('stroke', 'blue')
+        .style("fill", "none");
+
+        // draw line for federal
+
+        // draw line for all selected states
     }
 
     getChartName()
