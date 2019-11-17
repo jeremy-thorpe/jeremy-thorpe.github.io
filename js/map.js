@@ -9,8 +9,10 @@ class Map {
     constructor(data, selectionChanged) {
         this.data = data;
         this.selectedStates = [];
-        this.maxSelectedStates = 50;
+        this.maxSelectedStates = 10;
         this.selectionChangedCallback = selectionChanged;
+        this.colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+        this.colorArray = [];
     }
 
     drawMap(mapData)
@@ -22,27 +24,43 @@ class Map {
             return stateName.replace(' ', '');
         }
 
+        function removeSelection(state)
+        {
+            let index = that.selectedStates.indexOf(state);
+            that.selectedStates.splice(index,1);
+            that.colorArray.splice(index,1);
+            d3.select("#map_" + state).style("stroke", "black").style("stroke-width", "1").lower();  
+        }
+
+        function reserveNextColor()
+        {
+            for (let i = 0; i < 10; ++i)
+            {
+                let color = that.colorScale(i);
+                if (!that.colorArray.includes(color))
+                {
+                    that.colorArray.push(color);
+                    return color;
+                }
+            }
+        }
+
         function mapClicked(data)
         {
             let clickedState = getStateId(data.properties.NAME);
-            if (that.maxSelectedStates === 1)
+            if (that.selectedStates.includes(clickedState))
             {
-                that.selectedStates = [clickedState];
-            }
-            else if (that.selectedStates.includes(clickedState))
-            {
-                that.selectedStates.splice(that.selectedStates.indexOf(clickedState),1);
-                d3.select("#map_" + clickedState).classed("selected", false);
+                removeSelection(clickedState);
             }
             else
             {
                 if (that.selectedStates.length < that.maxSelectedStates)
                 {
                     that.selectedStates.push(clickedState);
-                    d3.select("#map_" + clickedState).classed("selected", true);
+                    d3.select("#map_" + clickedState).style("stroke", reserveNextColor()).style("stroke-width", "2").raise();
                 }
             }
-            that.selectionChangedCallback(that.selectedStates);
+            that.selectionChangedCallback(that.selectedStates, that.colorArray);
         }
 
         let projScale = 550;

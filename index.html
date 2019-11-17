@@ -6,9 +6,6 @@
     <title>The Rising Cost of College Education</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="https://d3js.org/d3.v5.js"></script>
-    <script src="js/map.js" async></script>
-    <script src="js/chart.js" async></script>
-    <script src="js/script.js" async></script>
     <link href="https://fonts.googleapis.com/css?family=Work+Sans:400,700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -16,22 +13,24 @@
         <h1>The Rising Cost of College Education</h1>
     </div>
     <div class="gridview">
-        <div class="map">
-            <svg id="map-svg" width="500px" height="300px"></svg>
+		<div id="year-slider">
+		</div>
+        <div id="bigchart">
         </div>
-        <div class="bigchart">
-            <svg id="main-chart-svg" width="500px" height="300px"></svg>
+        <div id="map">
         </div>
         <div class="smallchartarea">
-            <div class="smallchart1">
-                <svg id="sub-chart1-svg" width="200px" height="125px"></svg>
+            <div id="smallchart1">
             </div>
             <div></div>
-            <div class="smallchart2">
-                <svg id="sub-chart2-svg" width="200px" height="125px"></svg>
+            <div id="smallchart2">
             </div>
         </div>
         <div class="other">Storytelling goes here</div>
     </div>
+	
+    <script src="js/chart.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>

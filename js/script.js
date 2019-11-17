@@ -1,3 +1,10 @@
+// Append all svgs so size is dynamic
+d3.select("#year-slider").append("svg").attr("id", "year-slider-svg").attr("width", "100%").attr("height", "35px");
+d3.select("#bigchart").append("svg").attr("id", "main-chart-svg").attr("width", "100%").attr("height", "400px");
+d3.select("#map").append("svg").attr("id", "map-svg").attr("width", "100%").attr("height", "400px");
+d3.select("#smallchart1").append("svg").attr("id", "sub-chart1-svg").attr("width", "100%").attr("height", "150px");
+d3.select("#smallchart2").append("svg").attr("id", "sub-chart2-svg").attr("width", "100%").attr("height", "150px");
+
 var mainChart = new Chart("main-chart", swapChart);
 var subChart1 = new Chart("sub-chart1", swapChart);
 var subChart2 = new Chart("sub-chart2", swapChart);
@@ -8,18 +15,17 @@ var hoursHeader = "Hours Worked";
 
 function getDataByChartName(chartName)
 {
-    return minimumWageData; // remove this line once cost and hours are ready
     if (chartName === wageHeader)
     {
-        return allData.wage;
+        return minimumWageData;
     }
     else if (chartName === costHeader)
     {
-        return allData.cost;
+        return collegeCostData;
     }
     else if (chartName === hoursHeader)
     {
-        return allData.hours;
+        return hoursWorkedData;
     }
     return null;
 }
@@ -51,14 +57,16 @@ function swapChart(chartName)
     }
 }
 
-function statesChanged(newStates)
+function statesChanged(newStates, lineColors)
 {
-    mainChart.changeStates(newStates);
-    subChart1.changeStates(newStates);
-    subChart2.changeStates(newStates);
+    mainChart.changeStates(newStates, lineColors);
+    subChart1.changeStates(newStates, lineColors);
+    subChart2.changeStates(newStates, lineColors);
 }
 
-var minimumWageData;
+var minimumWageData = [];
+var collegeCostData = [];
+var hoursWorkedData = [];
 
 loadData().then(data => {
 
@@ -68,10 +76,8 @@ loadData().then(data => {
     let map = new Map(data, statesChanged)
     map.drawMap(data.map);
 
-    let wage = data.wage;
-    var wage_data = [];
-    console.log(wage);
-    for (let w of wage)
+    // wrangle wage data
+    for (let w of data.wage)
     {
         var points = [];
         for (let i = 1968; i < 2019; ++i)
@@ -79,14 +85,40 @@ loadData().then(data => {
             points.push([i, w[i]]);
         }
         var item = {state:w["State"], data:points};
-        wage_data.push(item);
+        minimumWageData.push(item);
     }
-    minimumWageData = wage_data;
+
+    // wrangle cost data
+    var costPoints = [];
+    for (let c of data.cost)
+    {
+        costPoints.push([c["Year"], c["Total-All"]]);
+    }
+    var item = {state:"Federal (FLSA)", data:costPoints};
+    collegeCostData.push(item);
+
+    // wrangle hours data
+    for (let yearData of data.hours)
+    {
+        for (let stateData of yearData.hours)
+        {
+            let stateIndex = hoursWorkedData.findIndex(d => d.state === stateData.state);
+            if (stateIndex === -1)
+            {
+                let pointData = [];
+                stateIndex = hoursWorkedData.push({state:stateData.state, data:pointData}) - 1;
+            }
+            hoursWorkedData[stateIndex].data.push([yearData.year, stateData["Total-All"]]);  
+        }
+    }
+
+    console.log("Wage Data", minimumWageData);
+    console.log("Cost Data", collegeCostData);
+    console.log("Hours Data", hoursWorkedData);
 
     mainChart.resetChart(hoursHeader, getDataByChartName(hoursHeader));
     subChart1.resetChart(costHeader, getDataByChartName(costHeader));
     subChart2.resetChart(wageHeader, getDataByChartName(wageHeader));
-
 });
 
 async function loadFile(file) {
@@ -110,11 +142,15 @@ async function loadData()
     let wageData = await loadFile("data/min-wage.csv");
     let wageScale = await loadFile("data/wage-scale.csv");
     let mapData = await d3.json('data/us_states.json');
+    let costData = await d3.json('data/All-Current.json');
+    let hourData = await d3.json('data/current_hours.json');
 
     return {
         'map': mapData,
         'wage': wageData,
-        'scale': wageScale
+        'scale': wageScale,
+        'cost': costData,
+        'hours': hourData
     };
 }
 

@@ -4,43 +4,42 @@
     grid-gap: 10px;
     grid-auto-rows: auto;
 }
-.map {
-    grid-column: 2;
-    grid-row: 1;
+
+#map {
 }
 
-.bigchart {
-    grid-column: 1;
-    grid-row: 1;
+#bigchart {
 }
 
 .smallchartarea
 {
-    grid-column: 1;
-    grid-row: 2;
     display: grid;
     grid-template-columns: 1fr 10px 1fr;;
 }
 
-.smallchart1 {
-    grid-column: 1;
-    grid-row: 2;
+#smallchart1 {
 }
 
-.smallchart2 {
-    grid-column: 3;
-    grid-row: 2;
+#smallchart2 {
 }
 
 .other {
-    grid-column: 2;
-    grid-row: 2;
 }
 
 .state {
     fill: white;
 }
 
-.selected {
-    fill: green;
+.header {
+	text-align: center;
+	color: coral;
+}
+
+h1 {
+	font-size: 40px;
+}
+
+#year-slider {
+	grid-column-start: 1;
+	grid-column-end: 3;
 }
