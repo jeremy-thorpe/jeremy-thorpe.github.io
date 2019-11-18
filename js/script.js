@@ -13,6 +13,14 @@ var wageHeader = "Minimum Wage";
 var costHeader = "College Cost";
 var hoursHeader = "Hours Worked";
 
+let story = new Story();
+d3.csv("data/COL_Data.csv").then(d => {
+	//d3.csv("data/events_data.csv").then(e => {
+		story.createStory(d, /*e*/null);
+		
+	//}
+});
+
 function getDataByChartName(chartName)
 {
     if (chartName === wageHeader)
@@ -62,6 +70,7 @@ function statesChanged(newStates, lineColors)
     mainChart.changeStates(newStates, lineColors);
     subChart1.changeStates(newStates, lineColors);
     subChart2.changeStates(newStates, lineColors);
+	  story.updateStory();
 }
 
 var minimumWageData = [];
@@ -153,5 +162,4 @@ async function loadData()
         'hours': hourData
     };
 }
-
 
