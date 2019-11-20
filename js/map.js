@@ -79,5 +79,159 @@ class Map {
             .attr("d", path)
             .on("click", d => mapClicked(d));
 
-    }
+            d3.select("#map-svg").selectAll("path").append('title')
+
+            d3.select('#map-svg')
+                .append('g')
+                    .attr('id', 'legend')
+                    .attr('transform', 'translate(500,0)')
+                .append('g')
+                    .attr('id', 'legend-axis');
+    
+            this.drawSlider();
+    
+        }
+    
+        /**
+         * Uses https://github.com/johnwalley/d3-simple-slider to create a discrete year slider.
+         */
+        drawSlider(){
+            let that = this;
+            // Time
+            var dataTime = d3.range(0, 51).map(function(d) {
+                return new Date(1968 + d, 10, 3);
+            });
+    
+            var sliderTime = d3
+                .sliderBottom()
+                .min(d3.min(dataTime))
+                .max(d3.max(dataTime))
+                .step(1000 * 60 * 60 * 24 * 365)
+                .width(450)
+                .ticks(0)
+                .handle(
+                    d3.symbol()
+                      .type(d3.symbolCircle)
+                      .size(200)()
+                  )
+                .on('onchange', val => {                
+                    d3.select('.parameter-value text')
+                        .classed('slider-label', true)
+                        .text(d3.timeFormat('%Y')(val));
+    
+                    that.updateHeatMap(+d3.timeFormat('%Y')(val), "hours");
+                });
+    
+            var gTime = d3
+                .select('#map-svg')
+                .append('g')
+                .attr('id', 'slider')
+                .attr('transform', 'translate(30, 330)');
+    
+            gTime.call(sliderTime);
+    
+            d3.select('.parameter-value text')
+                .classed('slider-label', true)
+                .style('font-size', 15)
+                .text(d3.timeFormat('%Y')(sliderTime.value()));
+    
+            this.updateHeatMap(+d3.timeFormat('%Y')(sliderTime.value()), "hours")
+    
+        }
+    
+        /**
+         * Updates the heat map for the given year.
+         * @param {number} year 
+         */
+        updateHeatMap(year, data_type){
+            // expand to include other datasets     
+            let data;
+            if (data_type === "hours"){
+                data = this.data.hours;
+            }
+            else if (data_type === "wage"){
+                data = this.data.wage;
+            }
+            else if (data_type === "cost"){
+                data = this.data.cost;
+            }
+            else{
+                console.log("No such data.");
+                return;
+            }
+            let yearData = this.data.hours.filter(d => {
+                return d.year === year;
+            });
+    
+    
+            if (yearData[0]){
+                yearData = yearData[0].hours.slice(1);
+    
+                //console.log(yearData.map(d => d['Total-All']));
+                var legendHeight = 200,
+                    legendWidth = 80,
+                    margin = {top: 10, right: 50, bottom: 10, left: 2};
+                
+                // Color scale
+                var colorScale = d3.scaleSequential(d3.interpolateCool)
+                    .domain([d3.min(yearData.map(d => d['Total-All'])), d3.max(yearData.map(d => d['Total-All']))]);
+    
+                var legendScale = d3.scaleLinear()
+                    .range([280, 0])
+                    .domain([d3.min(yearData.map(d => d['Total-All'])), d3.max(yearData.map(d => d['Total-All']))]);
+    
+                var legendAxis = d3.axisRight()
+                    .scale(legendScale)
+                    .tickSize(6)
+                    .ticks(8);
+    
+                d3.select("#map-svg").select('#legend-axis')
+                    .attr("transform", "translate(" + (legendWidth - margin.left - margin.right + 2) + "," + (margin.top) + ")")
+                    .call(legendAxis);
+    
+                //Append a defs (for definition) element to your SVG
+                var defs = d3.select("#map-svg")
+                    .selectAll('defs')
+                    .data([0])
+                    .join('defs')
+                    
+    
+                //Append a linearGradient element to the defs and give it a unique id
+                var linearGradient = defs.selectAll('linearGradient').data([0]).join("linearGradient")
+                    .attr("id", "linear-gradient");
+    
+                // Vertical gradient
+                linearGradient
+                    .attr("x1", "0%")
+                    .attr("y1", "100%")
+                    .attr("x2", "0%")
+                    .attr("y2", "0%");
+    
+                linearGradient.selectAll("stop")
+                    .data(colorScale.ticks().map((t, i, n) => ({ offset: `${100*i/n.length}%`, color: colorScale(t) })))
+                    .enter().append("stop")
+                    .attr("offset", d => d.offset)
+                    .attr("stop-color", d => d.color);
+    
+                //Draw the rectangle and fill with gradient
+                d3.select("#map-svg").select('#legend')
+                    .selectAll("rect")
+                    .data([0])
+                    .join("rect")
+                        .attr("width", 30)
+                        .attr("height", 280)
+                        .attr('transform', `translate(0, ${margin.top})`)
+                        .style("fill", "url(#linear-gradient)");
+    
+                // Color states
+                for (const hours of yearData) {
+                    let state = hours.state.replace(' ', '');
+                    
+                    d3.select("#map_" + state)
+                        .style('fill', colorScale(hours['Total-All']))
+                        .select('title')
+                        .html(`${hours['Total-All'].toFixed(2)}hrs`)
+                }
+            }
+        }
 }

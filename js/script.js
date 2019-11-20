@@ -2,6 +2,7 @@
 d3.select("#year-slider").append("svg").attr("id", "year-slider-svg").attr("width", "100%").attr("height", "35px");
 d3.select("#bigchart").append("svg").attr("id", "main-chart-svg").attr("width", "100%").attr("height", "400px");
 d3.select("#map").append("svg").attr("id", "map-svg").attr("width", "100%").attr("height", "400px");
+
 d3.select("#smallchart1").append("svg").attr("id", "sub-chart1-svg").attr("width", "100%").attr("height", "150px");
 d3.select("#smallchart2").append("svg").attr("id", "sub-chart2-svg").attr("width", "100%").attr("height", "150px");
 
