@@ -6,17 +6,17 @@
 }
 
 #map-grid {
-	display: grid;
-	grid-template-columns: auto 80px;
+    display: grid;
+    grid-template-columns: auto 80px;
 }
 
 #map-sub-grid {
-	display: grid;
-	grid-template-rows: auto 50px;
+    display: grid;
+    grid-template-rows: auto 50px;
 }
 
 #legend-axis.tick line {
-	display: none;
+    display: none;
 }
 
 #bigchart {
@@ -42,23 +42,23 @@
 }
 
 .header {
-	text-align: center;
-	color: coral;
+    text-align: center;
+    color: coral;
 }
 
 h1 {
-	font-size: 40px;
+    font-size: 40px;
 }
 
 #synopsis {
-	grid-column-start: 1;
-	grid-column-end: 3;
+    grid-column-start: 1;
+    grid-column-end: 3;
 }
 
 #story {
-	display: grid;
-	grid-template-columns: 50% 50%;
-	grid-template-rows: auto;
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: auto;
 }
 
 
@@ -88,7 +88,7 @@ h1 {
     }
 
 .slider-label {
-	font-size: 15px;
+    font-size: 15px;
 }
 
 input:checked + .slider {
@@ -113,7 +113,7 @@ input:checked + .slider:before {
     .slider.round:before {
         border-radius: 50%;
     }
-	
+    
 
 .grid-switch {
     padding: 10px;

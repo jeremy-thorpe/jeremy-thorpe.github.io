@@ -25,18 +25,18 @@ var hoursHeader = "Hours Worked";
 
 let story = new Story();
 d3.csv("data/COL_Data.csv").then(d => {
-	//d3.csv("data/events_data.csv").then(e => {
-		story.createStory(d, /*e*/null);
-		
-	//}
+    //d3.csv("data/events_data.csv").then(e => {
+        story.createStory(d, /*e*/null);
+        
+    //}
 });
 
 // Callback function for the year slider to ensure charts and story update as the year changes
 function updateYear(val) {
-	story.updateStory(val);
-	mainChart.updateChart();
-	subChart1.updateChart();
-	subChart2.updateChart();
+    story.updateStory(val);
+    mainChart.updateChart();
+    subChart1.updateChart();
+    subChart2.updateChart();
 }
 
 function getDataByChartName(chartName)
