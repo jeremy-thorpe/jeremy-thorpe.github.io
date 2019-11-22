@@ -74,7 +74,7 @@ class Chart {
         .selectAll("text")
         .attr("transform", "translate(" + (-(this.fontsize-2)) + "," + (this.fontsize-2) + ") rotate(-45)");
 
-        this.svg.on("dblclick", function(){
+        this.svg.on("click", function(){
             that.swapChartCallback(that.name)
         });
 
