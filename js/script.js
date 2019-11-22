@@ -1,10 +1,19 @@
 // Append all svgs so size is dynamic
-d3.select("#year-slider").append("svg").attr("id", "year-slider-svg").attr("width", "100%").attr("height", "35px");
-d3.select("#bigchart").append("svg").attr("id", "main-chart-svg").attr("width", "100%").attr("height", "400px");
-d3.select("#map").append("svg").attr("id", "map-svg").attr("width", "100%").attr("height", "400px");
+d3.select("#synopsis").append("svg").attr("id", "synopsis-svg").attr("width", "100%").attr("height", "35px");
 
-d3.select("#smallchart1").append("svg").attr("id", "sub-chart1-svg").attr("width", "100%").attr("height", "150px");
-d3.select("#smallchart2").append("svg").attr("id", "sub-chart2-svg").attr("width", "100%").attr("height", "150px");
+let temp = d3.select("#bigchart").append("svg").attr("id", "main-chart-svg").attr("width", "100%");
+temp.attr("height", (temp.node().getBoundingClientRect().width * 0.6));
+
+d3.select("#map").append("svg").attr("id", "map-svg").attr("width", "100%").attr("height", "100%");
+
+d3.select("#year").append("svg").attr("id", "slider-svg").attr("width", "100%").attr("height", "60px");
+d3.select("#map-scale").append("svg").attr("id", "map-scale-svg").attr("width", "100%").attr("height", "100%");
+
+temp = d3.select("#smallchart1").append("svg").attr("id", "sub-chart1-svg").attr("width", "100%");
+temp.attr("height", (temp.node().getBoundingClientRect().width * 0.6));
+
+temp = d3.select("#smallchart2").append("svg").attr("id", "sub-chart2-svg").attr("width", "100%");
+temp.attr("height", (temp.node().getBoundingClientRect().width * 0.6));
 
 var mainChart = new Chart("main-chart", swapChart);
 var subChart1 = new Chart("sub-chart1", swapChart);
@@ -32,6 +41,14 @@ d3.select("#toggle-button").on("change", function()
     subChart1.resetChart(subChart1.name, getDataByChartName(subChart1.name));
     subChart2.resetChart(subChart2.name, getDataByChartName(subChart2.name));
 });
+
+// Callback function for the year slider to ensure charts and story update as the year changes
+function updateYear(val) {
+    story.updateStory(val);
+    mainChart.updateYear(val);
+    subChart1.updateYear(val);
+    subChart2.updateYear(val);
+}
 
 function getDataByChartName(chartName)
 {
@@ -124,7 +141,7 @@ var hoursData = [];
 loadData().then(data => {
     console.log(data);
 
-    let map = new Map(data, statesChanged)
+    let map = new Map(data, statesChanged, updateYear)
     map.drawMap(data.map);
 
     // wrangle wage data

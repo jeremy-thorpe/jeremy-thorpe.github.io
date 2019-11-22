@@ -84,7 +84,7 @@ class Chart {
         .attr("transform", "translate(" + this.yAxisWidth + ",0)");
 
         this.yearLine = this.svg.append("line")
-        .style("stroke", "lightgray")
+        .style("stroke", "gray")
         .style("stroke-width", ".75px");
 
         this.states = [];
