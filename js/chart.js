@@ -45,7 +45,7 @@ class Chart {
         this.yScale = d3
         .scaleLinear()
         .domain([100, 0])
-        .range([0,this.height-this.xAxisHeight]);
+        .range([10,this.height-this.xAxisHeight]);
 
         this.yTicks = chartId === "main-chart" ? 10 : 5;
         this.xTicks = chartId === "main-chart" ? 15 : 5;
@@ -66,7 +66,8 @@ class Chart {
       
         this.yAxisGroup = this.svg.append("g")
         .attr("height", this.height-this.xAxisHeight-10)
-        .attr("transform", "translate(" + this.yAxisWidth +",0)") 
+        .attr("transform", "translate(" + this.yAxisWidth +",0)")
+        .style("font-size", this.fontsize) 
         .call(this.yAxis);
 
         this.xAxisGroup.call(this.xAxis)
@@ -98,7 +99,6 @@ class Chart {
 
         // reset data
         this.data = data;
-        console.log("Setting data for " + chartName, this.data);
 
         // redraw plot
         this.updateChart();
@@ -186,7 +186,7 @@ class Chart {
         this.yScale = d3
         .scaleLinear()
         .domain([Math.ceil(max*1.15), 0])
-        .range([10, this.chartArea.node().getBoundingClientRect().height]);
+        .range([10, this.chartArea.attr("height").replace("px", "")]);
         this.yAxis.scale(this.yScale).tickFormat(format).ticks(this.yTicks);
         this.yAxisGroup.transition().duration(500).call(this.yAxis);
       
