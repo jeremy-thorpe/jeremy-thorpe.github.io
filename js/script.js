@@ -13,28 +13,39 @@ var subChart2 = new Chart("sub-chart2", swapChart);
 var wageHeader = "Minimum Wage";
 var costHeader = "College Cost";
 var hoursHeader = "Hours Worked";
+var normalized = false;
 
 let story = new Story();
 d3.csv("data/COL_Data.csv").then(d => {
 	//d3.csv("data/events_data.csv").then(e => {
 		story.createStory(d, /*e*/null);
-		
+		story.updateStory();
 	//}
+});
+
+
+
+d3.select("#toggle-button").on("change", function()
+{
+    normalized = d3.select("#toggle-button").property("checked");
+    mainChart.resetChart(mainChart.name, getDataByChartName(mainChart.name));
+    subChart1.resetChart(subChart1.name, getDataByChartName(subChart1.name));
+    subChart2.resetChart(subChart2.name, getDataByChartName(subChart2.name));
 });
 
 function getDataByChartName(chartName)
 {
     if (chartName === wageHeader)
     {
-        return minimumWageData;
+        return normalized ? normWageData : actWageData;
     }
     else if (chartName === costHeader)
     {
-        return collegeCostData;
+        return normalized ? normCostData : actCostData;
     }
     else if (chartName === hoursHeader)
     {
-        return hoursWorkedData;
+        return hoursData;
     }
     return null;
 }
@@ -71,60 +82,72 @@ function statesChanged(newStates, lineColors)
     mainChart.changeStates(newStates, lineColors);
     subChart1.changeStates(newStates, lineColors);
     subChart2.changeStates(newStates, lineColors);
-	  story.updateStory();
 }
 
-var minimumWageData = [];
-var collegeCostData = [];
-var hoursWorkedData = [];
+function wrangleCostData(data)
+{
+    var costPoints = [];
+    var returnData = [];
+    for (let d of data)
+    {
+        costPoints.push([d["Year"], d["Total-All"]]);
+    }
+    returnData.push({state:"Federal (FLSA)", data:costPoints});
+    return returnData;
+}
+
+function wrangleHoursData(data)
+{
+    var returnData = [];
+    for (let yearData of data)
+    {
+        for (let stateData of yearData.hours)
+        {
+            let stateIndex = returnData.findIndex(d => d.state === stateData.state);
+            if (stateIndex === -1)
+            {
+                let pointData = [];
+                stateIndex = returnData.push({state:stateData.state, data:pointData}) - 1;
+            }
+            returnData[stateIndex].data.push([yearData.year, stateData["Total-All"]]);  
+        }
+    }
+    return returnData;
+}
+
+var actWageData = [];
+var normWageData = [];
+var actCostData = [];
+var normCostData = [];
+var hoursData = [];
 
 loadData().then(data => {
-
-    allData = data;
     console.log(data);
 
     let map = new Map(data, statesChanged)
     map.drawMap(data.map);
 
     // wrangle wage data
+    let inflationscale = data.scale;
     for (let w of data.wage)
     {
         var points = [];
+        var normalizedPoints = [];
         for (let i = 1968; i < 2019; ++i)
         {
             points.push([i, w[i]]);
+            normalizedPoints.push([i, (inflationscale[2018-1960].Scale/inflationscale[i-1960].Scale) * w[i]]);
         }
-        var item = {state:w["State"], data:points};
-        minimumWageData.push(item);
+        actWageData.push({state:w["State"], data:points});
+        normWageData.push({state:w["State"], data:normalizedPoints});
     }
 
     // wrangle cost data
-    var costPoints = [];
-    for (let c of data.cost)
-    {
-        costPoints.push([c["Year"], c["Total-All"]]);
-    }
-    var item = {state:"Federal (FLSA)", data:costPoints};
-    collegeCostData.push(item);
+    actCostData = wrangleCostData(data.costA);
+    normCostData = wrangleCostData(data.costN);
 
     // wrangle hours data
-    for (let yearData of data.hours)
-    {
-        for (let stateData of yearData.hours)
-        {
-            let stateIndex = hoursWorkedData.findIndex(d => d.state === stateData.state);
-            if (stateIndex === -1)
-            {
-                let pointData = [];
-                stateIndex = hoursWorkedData.push({state:stateData.state, data:pointData}) - 1;
-            }
-            hoursWorkedData[stateIndex].data.push([yearData.year, stateData["Total-All"]]);  
-        }
-    }
-
-    console.log("Wage Data", minimumWageData);
-    console.log("Cost Data", collegeCostData);
-    console.log("Hours Data", hoursWorkedData);
+    hoursData = wrangleHoursData(data.hours);
 
     mainChart.resetChart(hoursHeader, getDataByChartName(hoursHeader));
     subChart1.resetChart(costHeader, getDataByChartName(costHeader));
@@ -152,14 +175,16 @@ async function loadData()
     let wageData = await loadFile("data/min-wage.csv");
     let wageScale = await loadFile("data/wage-scale.csv");
     let mapData = await d3.json('data/us_states.json');
-    let costData = await d3.json('data/All-Current.json');
+    let normalizedCostData = await d3.json('data/All-Current.json');
+    let actualCostData = await d3.json('data/All-Constant.json');
     let hourData = await d3.json('data/current_hours.json');
 
     return {
         'map': mapData,
         'wage': wageData,
         'scale': wageScale,
-        'cost': costData,
+        'costN': normalizedCostData,
+        'costA' : actualCostData,
         'hours': hourData
     };
 }

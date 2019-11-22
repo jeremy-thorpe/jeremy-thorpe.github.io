@@ -11,10 +11,15 @@
 #bigchart {
 }
 
+.chartInfo {
+    grid-template-rows: 30px 1fr  
+}
+
 .smallchartarea
 {
     display: grid;
-    grid-template-columns: 1fr 25px 1fr;;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 10px;
 }
 
 #smallchart1 {
@@ -50,31 +55,38 @@ h1 {
 	grid-template-rows: auto;
 }
 
+.switch {
+    position: relative;
+}
 
 /* The slider */
 .slider {
     position: absolute;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: 2px;
+    top: 3px;
+    width: 22px;
+    height: 12px;
     background-color: #ccc;
     -webkit-transition: .4s;
     transition: .4s;
 }
 
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 26px;
-        width: 26px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        -webkit-transition: .4s;
-        transition: .4s;
-    }
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 10px;
+    width: 10px;
+    left: 1px;
+    bottom: 1px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input {
+    opacity: 0;
+}
 
 input:checked + .slider {
     background-color: #2196F3;
@@ -85,14 +97,14 @@ input:focus + .slider {
 }
 
 input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
+    -webkit-transform: translateX(10px);
+    -ms-transform: translateX(10px);
+    transform: translateX(10px);
 }
 
 /* Rounded sliders */
 .slider.round {
-    border-radius: 34px;
+    border-radius: 12px;
 }
 
     .slider.round:before {
@@ -101,5 +113,10 @@ input:checked + .slider:before {
 	
 
 .grid-switch {
-    padding: 10px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.grid-switch > text {
+    padding-left: 5px;
 }
