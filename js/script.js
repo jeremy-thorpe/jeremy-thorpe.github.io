@@ -6,7 +6,7 @@ temp.attr("height", (temp.node().getBoundingClientRect().width * 0.6));
 
 d3.select("#map").append("svg").attr("id", "map-svg").attr("width", "100%").attr("height", "100%");
 
-d3.select("#year").append("svg").attr("id", "slider-svg").attr("width", "100%").attr("height", "100%");
+d3.select("#year").append("svg").attr("id", "slider-svg").attr("width", "100%").attr("height", "60px");
 d3.select("#map-scale").append("svg").attr("id", "map-scale-svg").attr("width", "100%").attr("height", "100%");
 
 temp = d3.select("#smallchart1").append("svg").attr("id", "sub-chart1-svg").attr("width", "100%");

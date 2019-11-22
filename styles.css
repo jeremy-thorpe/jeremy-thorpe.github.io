@@ -7,12 +7,12 @@
 
 #map-grid {
 	display: grid;
-	grid-template-columns: 90% 10%;
+	grid-template-columns: auto 80px;
 }
 
 #map-sub-grid {
 	display: grid;
-	grid-template-rows: 85% 15%;
+	grid-template-rows: auto 50px;
 }
 
 #legend-axis.tick line {
@@ -86,6 +86,10 @@ h1 {
         -webkit-transition: .4s;
         transition: .4s;
     }
+
+.slider-label {
+	font-size: 15px;
+}
 
 input:checked + .slider {
     background-color: #2196F3;

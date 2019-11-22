@@ -99,7 +99,7 @@ class Map {
         drawSlider(){
             let that = this;
 			let width = d3.select("#slider-svg").node().getBoundingClientRect().width;
-			console.log("WIDTH", width);
+
             // Time
             var dataTime = d3.range(0, 51).map(function(d) {
                 return new Date(1968 + d, 10, 3);
@@ -130,13 +130,12 @@ class Map {
                 .select('#slider-svg')
                 .append('g')
                 .attr('id', 'slider')
-                .attr('transform', 'translate(30, 20)');
+                .attr('transform', 'translate(30, 10)');
     
             gTime.call(sliderTime);
     
             d3.select('.parameter-value text')
                 .classed('slider-label', true)
-                .style('font-size', 15)
                 .text(d3.timeFormat('%Y')(sliderTime.value()));
     
             this.updateHeatMap(+d3.timeFormat('%Y')(sliderTime.value()), "hours")
@@ -223,7 +222,7 @@ class Map {
                     .selectAll("rect")
                     .data([0])
                     .join("rect")
-                        .attr("width", 23)
+                        .attr("width", 30)
                         .attr("height", legendHeight - 100)
                         .attr('transform', `translate(0, ${margin.top})`)
                         .style("fill", "url(#linear-gradient)");
