@@ -5,7 +5,18 @@
     grid-auto-rows: auto;
 }
 
-#map {
+#map-grid {
+	display: grid;
+	grid-template-columns: 90% 10%;
+}
+
+#map-sub-grid {
+	display: grid;
+	grid-template-rows: 85% 15%;
+}
+
+#legend-axis.tick line {
+	display: none;
 }
 
 #bigchart {
@@ -39,7 +50,7 @@ h1 {
 	font-size: 40px;
 }
 
-#year-slider {
+#synopsis {
 	grid-column-start: 1;
 	grid-column-end: 3;
 }

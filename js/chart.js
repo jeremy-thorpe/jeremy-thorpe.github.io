@@ -14,7 +14,7 @@ class Chart {
         this.svg = d3.select("#" + chartId + "-svg");
 
         this.width = +this.svg.node().getBoundingClientRect().width;
-        this.height = +this.svg.attr("height").replace("px", "");
+        this.height = +this.svg.node().getBoundingClientRect().height;
 
         this.xScale = d3
         .scaleLinear()

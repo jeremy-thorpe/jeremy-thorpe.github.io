@@ -33,8 +33,8 @@ class Story {
 	* Update the Story display
 	* Get the value of the slider and update the display for the current year
 	*/
-	updateStory() {
-		this.currentYear = "2018";
+	updateStory(year) {
+		this.currentYear = year;
 		this.tempData = this.colData[this.currentYear - 1968];
 		// this.currentYear = d3.select("#year-slider").get current year
 		d3.select("#stampText").text("Stamps: $" + this.tempData["stamp"]);

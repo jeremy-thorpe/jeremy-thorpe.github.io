@@ -6,11 +6,12 @@ class Map {
      *
      * @param data
      */
-    constructor(data, selectionChanged) {
+    constructor(data, selectionChanged, updateYear) {
         this.data = data;
         this.selectedStates = [];
         this.maxSelectedStates = 10;
         this.selectionChangedCallback = selectionChanged;
+		this.updateYear = updateYear;
         this.colorScale = d3.scaleOrdinal(d3.schemeCategory10);
         this.colorArray = [];
     }
@@ -63,7 +64,8 @@ class Map {
             that.selectionChangedCallback(that.selectedStates, that.colorArray);
         }
 
-        let projScale = 550;
+		// Scale the map based on the size of the svg
+        let projScale = d3.select("#map-svg").node().getBoundingClientRect().width;
         let projection = d3.geoAlbersUsa().scale([projScale]).translate([projScale/2, projScale/4]);
 
         console.log("drawing map", mapData);
@@ -81,10 +83,9 @@ class Map {
 
             d3.select("#map-svg").selectAll("path").append('title')
 
-            d3.select('#map-svg')
+            d3.select('#map-scale-svg')
                 .append('g')
                     .attr('id', 'legend')
-                    .attr('transform', 'translate(500,0)')
                 .append('g')
                     .attr('id', 'legend-axis');
     
@@ -97,6 +98,8 @@ class Map {
          */
         drawSlider(){
             let that = this;
+			let width = d3.select("#slider-svg").node().getBoundingClientRect().width;
+			console.log("WIDTH", width);
             // Time
             var dataTime = d3.range(0, 51).map(function(d) {
                 return new Date(1968 + d, 10, 3);
@@ -107,7 +110,7 @@ class Map {
                 .min(d3.min(dataTime))
                 .max(d3.max(dataTime))
                 .step(1000 * 60 * 60 * 24 * 365)
-                .width(450)
+                .width(width - 60)
                 .ticks(0)
                 .handle(
                     d3.symbol()
@@ -120,13 +123,14 @@ class Map {
                         .text(d3.timeFormat('%Y')(val));
     
                     that.updateHeatMap(+d3.timeFormat('%Y')(val), "hours");
+					that.updateYear(d3.timeFormat('%Y')(val));
                 });
     
             var gTime = d3
-                .select('#map-svg')
+                .select('#slider-svg')
                 .append('g')
                 .attr('id', 'slider')
-                .attr('transform', 'translate(30, 330)');
+                .attr('transform', 'translate(30, 20)');
     
             gTime.call(sliderTime);
     
@@ -168,8 +172,8 @@ class Map {
                 yearData = yearData[0].hours.slice(1);
     
                 //console.log(yearData.map(d => d['Total-All']));
-                var legendHeight = 200,
-                    legendWidth = 80,
+                var legendHeight = d3.select("#map-scale-svg").node().getBoundingClientRect().height,
+                    legendWidth = d3.select("#map-scale-svg").node().getBoundingClientRect().width,
                     margin = {top: 10, right: 50, bottom: 10, left: 2};
                 
                 // Color scale
@@ -177,20 +181,21 @@ class Map {
                     .domain([d3.min(yearData.map(d => d['Total-All'])), d3.max(yearData.map(d => d['Total-All']))]);
     
                 var legendScale = d3.scaleLinear()
-                    .range([280, 0])
-                    .domain([d3.min(yearData.map(d => d['Total-All'])), d3.max(yearData.map(d => d['Total-All']))]);
+                    .range([legendHeight - 100, 0])
+                    .domain([d3.min(yearData.map(d => d['Total-All'])), d3.max(yearData.map(d => d['Total-All']))])
+					.nice();
     
                 var legendAxis = d3.axisRight()
                     .scale(legendScale)
-                    .tickSize(6)
-                    .ticks(8);
+                    .tickSize(0);
     
-                d3.select("#map-svg").select('#legend-axis')
+                d3.select("#map-scale-svg").select('#legend-axis')
                     .attr("transform", "translate(" + (legendWidth - margin.left - margin.right + 2) + "," + (margin.top) + ")")
-                    .call(legendAxis);
+                    .call(legendAxis)
+					.call(g => g.select(".domain").remove());
     
                 //Append a defs (for definition) element to your SVG
-                var defs = d3.select("#map-svg")
+                var defs = d3.select("#map-scale-svg")
                     .selectAll('defs')
                     .data([0])
                     .join('defs')
@@ -214,12 +219,12 @@ class Map {
                     .attr("stop-color", d => d.color);
     
                 //Draw the rectangle and fill with gradient
-                d3.select("#map-svg").select('#legend')
+                d3.select("#map-scale-svg").select('#legend')
                     .selectAll("rect")
                     .data([0])
                     .join("rect")
-                        .attr("width", 30)
-                        .attr("height", 280)
+                        .attr("width", 23)
+                        .attr("height", legendHeight - 100)
                         .attr('transform', `translate(0, ${margin.top})`)
                         .style("fill", "url(#linear-gradient)");
     
