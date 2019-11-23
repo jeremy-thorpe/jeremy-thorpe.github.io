@@ -30,7 +30,7 @@ class Map {
             let index = that.selectedStates.indexOf(state);
             that.selectedStates.splice(index,1);
             that.colorArray.splice(index,1);
-            d3.select("#map_" + state).style("stroke", "black").style("stroke-width", "1").lower();  
+            d3.select("#map_" + state).style("stroke", "black").style("stroke-width", "0.5").lower();  
         }
 
         function reserveNextColor()
