@@ -15,6 +15,40 @@ temp.attr("height", (temp.node().getBoundingClientRect().width * 0.6));
 temp = d3.select("#smallchart2").append("svg").attr("id", "sub-chart2-svg").attr("width", "100%");
 temp.attr("height", (temp.node().getBoundingClientRect().width * 0.6));
 
+var arrowData = [[0, 15], [10,21], [10, 18], [26, 18], [26, 12], [10,12], [10,9], [0,15]];
+var lineGenerator = d3.line();
+var arrowPath = lineGenerator(arrowData);
+
+let midChartArea = d3.select(".grid-switch");
+
+midChartArea.append("svg").attr("width", "30px").attr("height", "30px").attr("id", "arrow1").style("visibility", "hidden")
+.append("path")
+.attr("d", arrowPath)
+.style("fill", "coral")
+.style("stroke", "black")
+.attr("transform", "rotate(105) translate(-6, -40)");
+
+midChartArea.append("text").text("Actual");
+midChartArea.append("label")
+.attr("class", "switch");
+d3.select(".switch")
+.append("input")
+.attr("id", "toggle-button")
+.attr("type", "checkbox")
+.attr("transform", "translate(0, -100)");
+d3.select(".switch")
+.append("span")
+.classed("slider", true)
+.classed("round", true);
+midChartArea.append("text").text("Normalized");
+
+midChartArea.append("svg").attr("width", "30px").attr("height", "30px").attr("id", "arrow2").style("visibility", "hidden")
+.append("path")
+.attr("d", arrowPath)
+.style("fill", "coral")
+.style("stroke", "black")
+.attr("transform", "rotate(80) translate(3, -30)");
+
 var mainChart = new Chart("main-chart", swapChart);
 var subChart1 = new Chart("sub-chart1", swapChart);
 var subChart2 = new Chart("sub-chart2", swapChart);
