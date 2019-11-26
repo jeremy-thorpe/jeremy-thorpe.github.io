@@ -15,6 +15,7 @@ class Story {
     * Default Year is 2007
     */
     createStory(colData, eventsData) {
+		this.spacing = 30;
         this.colData = colData;
         this.eventsData = eventsData;   
         this.currentYear = "1971";
@@ -23,10 +24,11 @@ class Story {
         let temp = d3.select("#col-story-svg");
         console.log(this.tempData);
             
-        temp.append("text").attr("id", "stampText").attr("x", 10).attr("y", 20).text("Stamps: $" + this.tempData["stamp"]);
-        temp.append("text").attr("id", "gasText").attr("x", 10).attr("y", 40).text("Gas: $" + this.tempData["gas"]);
-        temp.append("text").attr("id", "eggsText").attr("x", 10).attr("y", 60).text("Eggs: $" + this.tempData["eggs"]);
-        temp.append("text").attr("id", "milkText").attr("x", 10).attr("y", 80).text("Milk: $" + this.tempData["milk"]);
+		temp.append("text").attr("class", "story-headline").attr("x", 10).attr("y", this.spacing).text("HEADLINE");
+        temp.append("text").attr("id", "stampText").attr("x", 10).attr("y", this.spacing * 2).text("Stamps: $" + this.tempData["stamp"]);
+        temp.append("text").attr("id", "gasText").attr("x", 10).attr("y", this.spacing * 3).text("Gas: $" + this.tempData["gas"]);
+        temp.append("text").attr("id", "eggsText").attr("x", 10).attr("y", this.spacing * 4).text("Eggs: $" + this.tempData["eggs"]);
+        temp.append("text").attr("id", "milkText").attr("x", 10).attr("y", this.spacing * 5).text("Milk: $" + this.tempData["milk"]);
     }
     
     /*
@@ -36,7 +38,7 @@ class Story {
     updateStory(year) {
         this.currentYear = year;
         this.tempData = this.colData[this.currentYear - 1968];
-        // this.currentYear = d3.select("#year-slider").get current year
+
         d3.select("#stampText").text("Stamps: $" + this.tempData["stamp"]);
         d3.select("#gasText").text("Gas: $" + this.tempData["gas"]);
         d3.select("#eggsText").text("Eggs: $" + this.tempData["eggs"]);

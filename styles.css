@@ -66,6 +66,14 @@ h1 {
     grid-template-rows: auto;
 }
 
+#col-story {
+	font-size: 26px;
+}
+
+#story-headline {
+	
+}
+
 .switch {
     position: relative;
 }

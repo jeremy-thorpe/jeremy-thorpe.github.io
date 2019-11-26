@@ -28,7 +28,6 @@ let story = new Story();
 d3.csv("data/COL_Data.csv").then(d => {
 	//d3.csv("data/events_data.csv").then(e => {
 		story.createStory(d, /*e*/null);
-		story.updateStory();
 	//}
 });
 
