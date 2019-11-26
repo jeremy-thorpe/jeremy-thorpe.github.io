@@ -87,6 +87,36 @@ class Chart {
         .style("stroke", "gray")
         .style("stroke-width", ".75px");
 
+        this.fullTimeDesc = this.svg.append("text")
+        .text("Full-Time")
+        .attr("x", this.yAxisWidth + 3)
+        .style("stroke", "gray")
+        .style("font-size", "10")
+        .style("visibility", "hidden");
+
+        this.fullTimeLine = this.svg.append("line")
+        .style("stroke", "gray")
+        .style("stroke-width", ".75px")
+        .style("visibility", "hidden");
+
+        this.tooltip = this.svg.append("g").attr("transform", "translate(" + (this.width-120) + "," + (this.height-this.xAxisHeight-22) + ")").style("visibility", "hidden");
+        this.tooltip.append("rect").attr("width", "120px").attr("height", "20px").style("stroke", "black").style("fill", "coral").style("opacity", "0.5");
+        this.tooltip.append("text").text("Tooltip").attr("tooltip-text");
+        this.tooltip.select("text").attr("transform", "translate(3,15)");
+
+        if (that.chartId !== "main-chart")
+        {
+            this.svg
+            .on("mousemove", function() {
+                var id = that.chartId === "sub-chart1" ? "#arrow1" : "#arrow2";
+                d3.select(id).style("visibility", "visible");
+            })
+            .on("mouseout", function(){
+                var id = that.chartId === "sub-chart1" ? "#arrow1" : "#arrow2";
+                d3.select(id).style("visibility", "hidden");
+            });
+        }
+
         this.states = [];
     }
 
@@ -197,6 +227,22 @@ class Chart {
          
         this.chartArea.selectAll('path').data(lineData)
         .join('path')
+        .on("mousemove", function(d)
+        {
+            if (that.chartId === "main-chart")
+            {
+                that.tooltip.style("visibility", "visible");
+                // this is to move the tooltip to mouse position if we want
+                // that.tooltip.attr("transform", "translate(" + (d3.mouse(this)[0]+50) + "," + (d3.mouse(this)[1]-25) + ")");
+                that.tooltip.select("text").text(d.state);
+                d3.select(this).style("stroke-width", "2px")
+            }
+        })
+        .on("mouseout", function()
+        {
+            that.tooltip.style("visibility", "hidden");
+            d3.select(this).style("stroke-width", "1px");
+        })
         .transition()
         .duration(500)
         .attr('d', d => lineGenerator(d.data))
@@ -210,6 +256,29 @@ class Chart {
         .attr("y2", "0")
         .attr("x1", this.yAxisWidth + this.xScale(this.year))
         .attr("x2", this.yAxisWidth + this.xScale(this.year))
+
+        if (this.name === "Hours Worked")
+        {
+            this.fullTimeLine
+            .transition()
+            .duration(500)
+            .attr("y1", this.yScale(40))
+            .attr("y2", this.yScale(40))
+            .attr("x1", this.yAxisWidth)
+            .attr("x2", this.width)
+            .style("visibility", "visible");
+
+            this.fullTimeDesc
+            .transition()
+            .duration(500)
+            .attr("y", this.yScale(40) - 5)
+            .style("visibility", "visible");
+        }
+        else
+        {
+            this.fullTimeLine.style("visibility", "hidden");
+            this.fullTimeDesc.style("visibility", "hidden");
+        }
     }
 
     getChartName()
