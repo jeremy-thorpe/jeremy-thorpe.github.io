@@ -15,7 +15,15 @@
     grid-template-rows: auto 50px;
 }
 
-#legend-axis.tick line {
+#map {
+    text-align: center;
+}
+
+.fed-wage-text {
+    font: bold 10px sans-serif;
+}
+
+#legend-axis.tick line, #legend-axis .domain {
     display: none;
 }
 
