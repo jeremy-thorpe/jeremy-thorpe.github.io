@@ -15,6 +15,8 @@ temp.attr("height", (temp.node().getBoundingClientRect().width * 0.6));
 temp = d3.select("#smallchart2").append("svg").attr("id", "sub-chart2-svg").attr("width", "100%");
 temp.attr("height", (temp.node().getBoundingClientRect().width * 0.6));
 
+d3.select("#clear-button").on("click", clearStates);
+
 var arrowData = [[0, 15], [10,21], [10, 18], [26, 18], [26, 12], [10,12], [10,9], [0,15]];
 var lineGenerator = d3.line();
 var arrowPath = lineGenerator(arrowData);
@@ -53,6 +55,8 @@ var mainChart = new Chart("main-chart", swapChart);
 var subChart1 = new Chart("sub-chart1", swapChart);
 var subChart2 = new Chart("sub-chart2", swapChart);
 
+var map;
+
 var wageHeader = "Minimum Wage";
 var costHeader = "College Cost";
 var hoursHeader = "Hours Worked";
@@ -60,10 +64,9 @@ var normalized = false;
 
 let story = new Story();
 d3.csv("data/COL_Data.csv").then(d => {
-	//d3.csv("data/events_data.csv").then(e => {
-		story.createStory(d, /*e*/null);
-		story.updateStory();
-	//}
+    d3.csv("data/events.csv").then(e => {
+        story.createStory(d, e);
+    })
 });
 
 
@@ -173,9 +176,7 @@ var normCostData = [];
 var hoursData = [];
 
 loadData().then(data => {
-    console.log(data);
-
-    let map = new Map(data, statesChanged, updateYear)
+    map = new Map(data, statesChanged, updateYear)
     map.drawMap(data.map);
 
     // wrangle wage data
@@ -194,8 +195,8 @@ loadData().then(data => {
     }
 
     // wrangle cost data
-    actCostData = wrangleCostData(data.costA);
-    normCostData = wrangleCostData(data.costN);
+    actCostData = wrangleCostData(data.costN);
+    normCostData = wrangleCostData(data.costA);
 
     // wrangle hours data
     hoursData = wrangleHoursData(data.hours);
@@ -240,3 +241,11 @@ async function loadData()
     };
 }
 
+function clearStates() {
+    console.log(map);
+    map.clearMap();
+    
+    mainChart.resetChart(hoursHeader, getDataByChartName(hoursHeader));
+    subChart1.resetChart(costHeader, getDataByChartName(costHeader));
+    subChart2.resetChart(wageHeader, getDataByChartName(wageHeader));
+}

@@ -26,13 +26,6 @@ class Map {
             return stateName.replace(' ', '');
         }
 
-        function removeSelection(state) {
-            let index = that.selectedStates.indexOf(state);
-            that.selectedStates.splice(index, 1);
-            that.colorArray.splice(index, 1);
-            d3.select("#map_" + state).style("stroke", "black").style("stroke-width", "0.5").lower();
-        }
-
         function reserveNextColor() {
             for (let i = 0; i < 10; ++i) {
                 let color = that.colorScale(i);
@@ -46,7 +39,7 @@ class Map {
         function mapClicked(data) {
             let clickedState = getStateId(data.properties.NAME);
             if (that.selectedStates.includes(clickedState)) {
-                removeSelection(clickedState);
+                that.removeSelection(clickedState);
             } else {
                 if (that.selectedStates.length < that.maxSelectedStates) {
                     that.selectedStates.push(clickedState);
@@ -74,7 +67,7 @@ class Map {
             .on("click", d => mapClicked(d));
 
         d3.select("#map-svg").selectAll("path").append('title')
-
+        
         d3.select('#map-scale-svg')
             .append('g')
             .attr('id', 'legend')
@@ -84,7 +77,15 @@ class Map {
         this.setup();
 
     }
-
+    
+    removeSelection(state)
+    {
+        let index = this.selectedStates.indexOf(state);
+        this.selectedStates.splice(index,1);
+        this.colorArray.splice(index,1);
+        d3.select("#map_" + state).style("stroke", "black").style("stroke-width", "0.5").lower();  
+    }
+    
     /**
      * Uses https://github.com/johnwalley/d3-simple-slider to create a discrete year slider and dropdown callbacks.
      */
@@ -96,7 +97,7 @@ class Map {
         var dataTime = d3.range(0, 51).map(function (d) {
             return new Date(1968 + d, 10, 3);
         });
-
+        
         var sliderTime = d3
             .sliderBottom()
             .min(d3.min(dataTime))
@@ -209,7 +210,7 @@ class Map {
                 .domain([d3.min(data.map(d => d.datum)), d3.max(data.map(d => d.datum))]);
 
             var legendScale = d3.scaleLinear()
-                .range([legendHeight - 100, 0])
+                .range([legendHeight - 30, 0])
                 .domain([d3.min(data.map(d => d.datum)), d3.max(data.map(d => d.datum))])
                 .nice();
 
@@ -290,7 +291,7 @@ class Map {
                 .data([0])
                 .join("rect")
                     .attr("width", 30)
-                    .attr("height", legendHeight - 100)
+                    .attr("height", legendHeight - 30)
                     .attr('transform', `translate(0, ${margin.top})`)
                     .style("fill", "url(#linear-gradient)");
 
@@ -314,6 +315,17 @@ class Map {
                     .select('title')
                     .html(`${st}`)
             }
+        }
+    }
+    
+    /**
+    * Clears all highlighted states from map
+    *
+    */
+    clearMap() {
+        while (this.selectedStates.length > 0)
+        {
+            this.removeSelection(this.selectedStates[0]);
         }
     }
 }
