@@ -12,23 +12,58 @@
     <script src="https://unpkg.com/d3-simple-slider"></script>
     <link href="https://fonts.googleapis.com/css?family=Work+Sans:400,700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="header">
         <h1>The Rising Cost of College Education</h1>
     </div>
     <div class="gridview">
         <div id="synopsis">
-			<p>College costs have risen dramatically over the past 50 years. <br>These charts show not only the increase, but also the decrease in purchasing power of minimum wage.</p>
+            <p>College costs have risen dramatically over the past 50 years. <br>These charts show not only the increase, but also the decrease in purchasing power of minimum wage.</p>
         </div>
         <div id="bigchart">
         </div>
         <div id="map-grid">
-			<div id="map"></div>
-			<div id="map-scale"></div>
-			<div id="year"></div>
-			<div id="map-clear">
-				<button id="clear-button" type="button">Clear</button>
-			</div>
+            <div id="map">
+                <span id="map-dropdown">
+                    Select Heat Map Data:
+                    <select>
+                        <option value="none">None</option>
+                        <option selected value="hours">Hours</option>
+                        <option value="wage">Min-wage</option>
+                    </select>
+                </span>
+                <span id="map-sub-dropdown">
+                    Select Sub-Category:
+                    <select>
+                        <optgroup label="Total">
+                            <option selected value="Total-All">All</option>
+                            <option value="Total-2">2 Year Schools</option>
+                            <option value="Total-4">4 Year Schools</option>
+                        </optgroup>
+                        <optgroup label="Tuition">
+                            <option value="Tuition-All">All</option>
+                            <option value="Tuition-2">2 Year Schools</option>
+                            <option value="Tuition-4">4 Year Schools</option>
+                        </optgroup>
+                        <optgroup label="Dorms">
+                            <option value="Dorms-All">All</option>
+                            <option value="Dorms-2">2 Year Schools</option>
+                            <option value="Dorms-4">4 Year Schools</option>
+                        </optgroup>
+                        <optgroup label="Board">
+                            <option value="Board-All">All</option>
+                            <option value="Board-2">2 Year Schools</option>
+                            <option value="Board-4">4 Year Schools</option>
+                        </optgroup>
+                    </select>
+                </span>
+            </div>
+            <div id="map-scale"></div>
+            <div id="year"></div>
+            <div id="map-clear">
+                <button id="clear-button" type="button">Clear</button>
+            </div>
         </div>
         <div class="chartInfo">
             <div class="grid-switch"></div>
@@ -44,10 +79,11 @@
             </div>
         </div>
     </div>
-  
+
     <script src="js/story.js"></script>
     <script src="js/chart.js"></script>
     <script src="js/map.js"></script>
     <script src="js/script.js"></script>
 </body>
+
 </html>

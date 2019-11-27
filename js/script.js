@@ -64,9 +64,9 @@ var normalized = false;
 
 let story = new Story();
 d3.csv("data/COL_Data.csv").then(d => {
-	d3.csv("data/events.csv").then(e => {
-		story.createStory(d, e);
-	})
+    d3.csv("data/events.csv").then(e => {
+        story.createStory(d, e);
+    })
 });
 
 
@@ -242,9 +242,9 @@ async function loadData()
 }
 
 function clearStates() {
-	console.log(map);
-	map.clearMap();
-	
+    console.log(map);
+    map.clearMap();
+    
     mainChart.resetChart(hoursHeader, getDataByChartName(hoursHeader));
     subChart1.resetChart(costHeader, getDataByChartName(costHeader));
     subChart2.resetChart(wageHeader, getDataByChartName(wageHeader));

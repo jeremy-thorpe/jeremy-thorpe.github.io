@@ -8,10 +8,18 @@
 #map-grid {
     display: grid;
     grid-template-columns: auto 80px;
-	grid-template-rows: auto 50px;
+    grid-template-rows: auto 50px;
 }
 
-#legend-axis.tick line {
+#map {
+    text-align: center;
+}
+
+.fed-wage-text {
+    font: bold 10px sans-serif;
+}
+
+#legend-axis.tick line, #legend-axis .domain {
     display: none;
 }
 
@@ -63,19 +71,19 @@ h1 {
 }
 
 .cola {
-	font-size: 22px;
+    font-size: 22px;
 }
 
 .story-headline {
-	font-size: 26px;
+    font-size: 26px;
 }
 
 .event-headline {
-	font-size: 26px;
+    font-size: 26px;
 }
 
 a {
-	font-size: 22px;
+    font-size: 22px;
 }
 
 .switch {
