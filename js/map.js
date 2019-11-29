@@ -81,8 +81,7 @@ class Map {
 
     }
     
-    removeSelection(state)
-    {
+    removeSelection(state) {
         let index = this.selectedStates.indexOf(state);
         this.selectedStates.splice(index,1);
         this.colorArray.splice(index,1);
@@ -97,7 +96,7 @@ class Map {
         let width = d3.select("#slider-svg").node().getBoundingClientRect().width;
 
         // Time
-        var dataTime = d3.range(0, 51).map(function (d) {
+        var dataTime = d3.range(0, 50).map(function (d) {
             return new Date(1968 + d, 10, 3);
         });
         
@@ -138,31 +137,11 @@ class Map {
      * Updates the heat map for the given year.
      * @param {number} year 
      */
-    updateHeatMap(year, data_type, sub_type) {
+    updateHeatMap(year, data_type) {
         let data;
         let interpolateFunc;
 
-        if (sub_type === undefined)
-        {
-            sub_type = "Total-All";
-        }
-        
-        if (data_type === "hours" && year !== 2018) {
-            d3.select("#data-sub-dropdown").style("opacity", 1);
-            interpolateFunc = d3.interpolateYlOrRd;
-            data = new Object();
-            data.year = year;
-            data.data = [];
-
-            for (const hours of this.data.hours.filter(d => d.year === year)[0].hours) {
-                data.data.push({
-                    state: hours.state,
-                    datum: hours[sub_type]
-                });
-
-            }
-        } else if (data_type === "wage") {
-            d3.select("#data-sub-dropdown").style("opacity", 0);
+		if (data_type === "wage") {
             interpolateFunc = d3.interpolateYlGn;
             data = new Object()
             data.year = year;
@@ -174,9 +153,18 @@ class Map {
                     datum: wage[year]
                 });
             }
-        } else if (data_type === "none") {
-            d3.select("#data-sub-dropdown").style("opacity", 0);
+        } else if (year !== 2018) {
+            interpolateFunc = d3.interpolateYlOrRd;
             data = new Object();
+            data.year = year;
+            data.data = [];
+
+            for (const hours of this.data.hours.filter(d => d.year === year)[0].hours) {
+                data.data.push({
+                    state: hours.state,
+                    datum: hours[data_type]
+                });
+            }
         } else {
             console.log("No such data.");
             data = new Object();
@@ -293,10 +281,17 @@ class Map {
             for (const item of data) {
                 let state = item.state.replace(' ', '');
 
-                d3.select("#map_" + state)
-                    .style('fill', colorScale(item.datum))
-                    .select('title')
-                    .html(`${item.datum.toFixed(2)}hrs`)
+				if (data_type === "wage") {
+					d3.select("#map_" + state)
+						.style('fill', colorScale(item.datum))
+						.select('title')
+						.html(`\$${item.datum.toFixed(2)}`)
+				} else {
+					d3.select("#map_" + state)
+						.style('fill', colorScale(item.datum))
+						.select('title')
+						.html(`${item.datum.toFixed(2)} hrs`)
+				}
             }
         } else {
             scaleSvg.style("opacity", 0);
@@ -317,8 +312,7 @@ class Map {
     *
     */
     clearMap() {
-        while (this.selectedStates.length > 0)
-        {
+        while (this.selectedStates.length > 0) {
             this.removeSelection(this.selectedStates[0]);
         }
     }
