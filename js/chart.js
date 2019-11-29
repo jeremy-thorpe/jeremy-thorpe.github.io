@@ -49,12 +49,19 @@ class Chart {
 
         this.yTicks = chartId === "main-chart" ? 10 : 5;
         this.xTicks = chartId === "main-chart" ? 15 : 5;
-        this.colCostFormat = function(d) {return parseInt(d/1000) + "k";};                                          
+        this.colCostFormat = function(d) {return (d/1000).toPrecision(2);};                                          
 
-        this.title = this.svg.append("text")
-        .text("Graph Title")
-        .attr("transform", "translate(" + (this.chartId === "main-chart" ? this.width/2 : this.yAxisWidth+20) + "," + this.fontsize + ")")
-        .style("font-size", this.fontsize+2);
+        if (this.chartId !== "main-chart")
+        {
+            this.title = this.svg.append("text")
+            .text("Graph Title")
+            .attr("transform", "translate(" + (this.yAxisWidth+20) + "," + this.fontsize + ")")
+            .style("font-size", this.fontsize+2);
+        }
+        else
+        {
+            this.title = d3.select("#main-chart-title");
+        }
 
         this.xAxis = d3.axisBottom().scale(this.xScale).tickFormat(d3.format("d")).ticks(this.xTicks);
         this.yAxis = d3.axisLeft().scale(this.yScale).ticks(this.yTicks).tickFormat(this.yFormat);
@@ -67,7 +74,7 @@ class Chart {
         this.yAxisGroup = this.svg.append("g")
         .attr("height", this.height-this.xAxisHeight-10)
         .attr("transform", "translate(" + this.yAxisWidth +",0)")
-        .style("font-size", this.fontsize) 
+        .style("font-size", this.fontsize-2) 
         .call(this.yAxis);
 
         this.xAxisGroup.call(this.xAxis)
@@ -120,15 +127,73 @@ class Chart {
         this.states = [];
     }
 
-    resetChart(chartName, data)
+    wrangleCostData(data, data_sub_type)
     {
+        var costPoints = [];
+        var returnData = [];
+        for (let d of data)
+        {
+            costPoints.push([d["Year"], d[data_sub_type]]);
+        }
+        returnData.push({state:"Federal (FLSA)", data:costPoints});
+        return returnData;
+    }
+
+    wrangleHoursData(data, data_sub_type)
+    {
+        var returnData = [];
+        for (let yearData of data)
+        {
+            for (let stateData of yearData.hours)
+            {
+                let stateIndex = returnData.findIndex(d => d.state === stateData.state);
+                if (stateIndex === -1)
+                {
+                    let pointData = [];
+                    stateIndex = returnData.push({state:stateData.state, data:pointData}) - 1;
+                }
+                returnData[stateIndex].data.push([yearData.year, stateData[data_sub_type]]);  
+            }
+        }
+        return returnData;
+    }
+
+    changeDataSubType(data_sub_type)
+    {
+        this.resetChart(this.name, this.dataset, data_sub_type)
+    }
+
+    resetChart(chartName, data, data_sub_type)
+    {
+        if (data_sub_type === undefined)
+        {
+            data_sub_type = "Total-All";
+        }
+
         this.name = chartName;
+        this.dataset = data;
 
         // reset title
         this.title.text(chartName);
 
         // reset data
-        this.data = data;
+        if (chartName === "Hours Worked")
+        {
+            this.currentData = this.wrangleHoursData(data, data_sub_type);
+        }
+        else if (chartName === "Minimum Wage")
+        {
+            // minimum wage data should already be in the right format
+            this.currentData = data;
+        }
+        else if (chartName === "College Cost")
+        {
+            this.currentData = this.wrangleCostData(data, data_sub_type);
+        }
+        else
+        {
+            console.log("No such data");
+        }
 
         // redraw plot
         this.updateChart();
@@ -157,13 +222,13 @@ class Chart {
             return stateName.replace(' ', '');
         }
 
-        if (this.data[0].state === undefined)
+        if (this.currentData[0].state === undefined)
         {
-            lineData = this.data;
+            lineData = this.currentData;
         }
         else
         {
-            lineData = this.data.filter(function(d){
+            lineData = this.currentData.filter(function(d){
                 if (that.isFederalData(d.state)) return true; // always want federal chart
                 return that.states.includes(getStateId(d.state));
             });
@@ -184,7 +249,7 @@ class Chart {
                 return that.lineColors[that.states.indexOf(getStateId(state))];
             }
         }
-     
+
         var max = 0;
         for (let d of lineData)
         {

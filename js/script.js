@@ -51,12 +51,22 @@ midChartArea.append("svg").attr("width", "30px").attr("height", "30px").attr("id
 .style("stroke", "black")
 .attr("transform", "rotate(80) translate(3, -30)");
 
+// charts
 var mainChart = new Chart("main-chart", swapChart);
 var subChart1 = new Chart("sub-chart1", swapChart);
 var subChart2 = new Chart("sub-chart2", swapChart);
 
 var map;
 
+// data
+var allData;
+var data_type = "hours";
+var data_sub_type = undefined;
+var selected_year = 1969;
+var actWageData = [];
+var normWageData = [];
+
+// data headers
 var wageHeader = "Minimum Wage";
 var costHeader = "College Cost";
 var hoursHeader = "Hours Worked";
@@ -69,22 +79,37 @@ d3.csv("data/COL_Data.csv").then(d => {
     })
 });
 
-
-
 d3.select("#toggle-button").on("change", function()
 {
     normalized = d3.select("#toggle-button").property("checked");
-    mainChart.resetChart(mainChart.name, getDataByChartName(mainChart.name));
-    subChart1.resetChart(subChart1.name, getDataByChartName(subChart1.name));
-    subChart2.resetChart(subChart2.name, getDataByChartName(subChart2.name));
+    mainChart.resetChart(mainChart.name, getDataByChartName(mainChart.name), data_sub_type);
+    subChart1.resetChart(subChart1.name, getDataByChartName(subChart1.name), data_sub_type);
+    subChart2.resetChart(subChart2.name, getDataByChartName(subChart2.name), data_sub_type);
+});
+
+d3.select("#data-dropdown").on("change", function()
+{
+    data_type = d3.select(this).select("select").property("value");
+    map.updateHeatMap(selected_year, data_type, data_sub_type);
+});
+
+d3.select("#data-sub-dropdown").on("change", function()
+{
+    data_sub_type = d3.select(this).select("select").property("value");
+    map.updateHeatMap(selected_year, data_type, data_sub_type);
+    mainChart.changeDataSubType(data_sub_type);
+    subChart1.changeDataSubType(data_sub_type);
+    subChart2.changeDataSubType(data_sub_type);
 });
 
 // Callback function for the year slider to ensure charts and story update as the year changes
-function updateYear(val) {
-    story.updateStory(val);
-    mainChart.updateYear(val);
-    subChart1.updateYear(val);
-    subChart2.updateYear(val);
+function updateYear(year) {
+    selected_year = year;
+    story.updateStory(year);
+    mainChart.updateYear(year);
+    subChart1.updateYear(year);
+    subChart2.updateYear(year);
+    map.updateHeatMap(year, data_type, data_sub_type);
 }
 
 function getDataByChartName(chartName)
@@ -95,11 +120,11 @@ function getDataByChartName(chartName)
     }
     else if (chartName === costHeader)
     {
-        return normalized ? normCostData : actCostData;
+        return normalized ? allData.costN : allData.costA;
     }
     else if (chartName === hoursHeader)
     {
-        return hoursData;
+        return allData.hours;
     }
     return null;
 }
@@ -115,14 +140,14 @@ function swapChart(chartName)
     else if (chartName === subChart1.getChartName())
     {
         // swap main-chart with sub-chart1
-        mainChart.resetChart(chartName, getDataByChartName(chartName));
-        subChart1.resetChart(currentChartName, getDataByChartName(currentChartName));
+        mainChart.resetChart(chartName, getDataByChartName(chartName), data_sub_type);
+        subChart1.resetChart(currentChartName, getDataByChartName(currentChartName), data_sub_type);
     }
     else if (chartName === subChart2.getChartName())
     {
         // swap main-chart with sub-chart2
-        mainChart.resetChart(chartName, getDataByChartName(chartName));
-        subChart2.resetChart(currentChartName, getDataByChartName(currentChartName));
+        mainChart.resetChart(chartName, getDataByChartName(chartName), data_sub_type);
+        subChart2.resetChart(currentChartName, getDataByChartName(currentChartName), data_sub_type);
     }
     else
     {
@@ -138,46 +163,11 @@ function statesChanged(newStates, lineColors)
     subChart2.changeStates(newStates, lineColors);
 }
 
-function wrangleCostData(data)
-{
-    var costPoints = [];
-    var returnData = [];
-    for (let d of data)
-    {
-        costPoints.push([d["Year"], d["Total-All"]]);
-    }
-    returnData.push({state:"Federal (FLSA)", data:costPoints});
-    return returnData;
-}
-
-function wrangleHoursData(data)
-{
-    var returnData = [];
-    for (let yearData of data)
-    {
-        for (let stateData of yearData.hours)
-        {
-            let stateIndex = returnData.findIndex(d => d.state === stateData.state);
-            if (stateIndex === -1)
-            {
-                let pointData = [];
-                stateIndex = returnData.push({state:stateData.state, data:pointData}) - 1;
-            }
-            returnData[stateIndex].data.push([yearData.year, stateData["Total-All"]]);  
-        }
-    }
-    return returnData;
-}
-
-var actWageData = [];
-var normWageData = [];
-var actCostData = [];
-var normCostData = [];
-var hoursData = [];
-
 loadData().then(data => {
+    allData = data;
     map = new Map(data, statesChanged, updateYear)
     map.drawMap(data.map);
+    map.updateHeatMap(selected_year, data_type, data_sub_type);
 
     // wrangle wage data
     let inflationscale = data.scale;
@@ -194,16 +184,9 @@ loadData().then(data => {
         normWageData.push({state:w["State"], data:normalizedPoints});
     }
 
-    // wrangle cost data
-    actCostData = wrangleCostData(data.costN);
-    normCostData = wrangleCostData(data.costA);
-
-    // wrangle hours data
-    hoursData = wrangleHoursData(data.hours);
-
-    mainChart.resetChart(hoursHeader, getDataByChartName(hoursHeader));
-    subChart1.resetChart(costHeader, getDataByChartName(costHeader));
-    subChart2.resetChart(wageHeader, getDataByChartName(wageHeader));
+    mainChart.resetChart(hoursHeader, getDataByChartName(hoursHeader), data_sub_type);
+    subChart1.resetChart(costHeader, getDataByChartName(costHeader), data_sub_type);
+    subChart2.resetChart(wageHeader, getDataByChartName(wageHeader), data_sub_type);
 });
 
 async function loadFile(file) {
@@ -227,8 +210,8 @@ async function loadData()
     let wageData = await loadFile("data/min-wage.csv");
     let wageScale = await loadFile("data/wage-scale.csv");
     let mapData = await d3.json('data/us_states.json');
-    let normalizedCostData = await d3.json('data/All-Current.json');
-    let actualCostData = await d3.json('data/All-Constant.json');
+    let normalizedCostData = await d3.json('data/All-Constant.json');
+    let actualCostData = await d3.json('data/All-Current.json');
     let hourData = await d3.json('data/current_hours.json');
 
     return {
@@ -245,7 +228,7 @@ function clearStates() {
     console.log(map);
     map.clearMap();
     
-    mainChart.resetChart(hoursHeader, getDataByChartName(hoursHeader));
-    subChart1.resetChart(costHeader, getDataByChartName(costHeader));
-    subChart2.resetChart(wageHeader, getDataByChartName(wageHeader));
+    mainChart.resetChart(hoursHeader, getDataByChartName(hoursHeader), data_sub_type);
+    subChart1.resetChart(costHeader, getDataByChartName(costHeader), data_sub_type);
+    subChart2.resetChart(wageHeader, getDataByChartName(wageHeader), data_sub_type);
 }

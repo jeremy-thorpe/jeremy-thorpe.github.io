@@ -10,13 +10,13 @@ class Map {
         this.data = data;
         this.selectedStates = [];
         this.states = data.hours[0].hours.map(d => d.state).slice(1)
-        // console.log("states", data.hours[0].hours.map(d => d.state).slice(1));
 
         this.maxSelectedStates = 10;
         this.selectionChangedCallback = selectionChanged;
         this.updateYear = updateYear;
-        this.colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+        this.border_colors = ["blue", "yellow", "red", "deeppink", "darkgoldenrod", "aqua", "slategray", "indigo", "saddlebrown", "chartreuse"];
         this.colorArray = [];
+        this.colorIndex = 0;
     }
 
     drawMap(mapData) {
@@ -27,13 +27,16 @@ class Map {
         }
 
         function reserveNextColor() {
-            for (let i = 0; i < 10; ++i) {
-                let color = that.colorScale(i);
-                if (!that.colorArray.includes(color)) {
-                    that.colorArray.push(color);
-                    return color;
-                }
+            if (that.colorArray.length === that.border_colors.length)
+            {
+                return null;
             }
+            while (that.colorArray.includes(that.border_colors[that.colorIndex])) {
+                that.colorIndex = (that.colorIndex+1) % that.border_colors.length;
+            }
+            let color = that.border_colors[that.colorIndex];
+            that.colorArray.push(color);
+            return color;    
         }
 
         function mapClicked(data) {
@@ -113,10 +116,9 @@ class Map {
             .on('onchange', val => {
                 d3.select('.parameter-value text')
                     .classed('slider-label', true)
-                    .text(d3.timeFormat('%Y')(val));
+                    .text(val.getFullYear());
 
-                that.updateHeatMap(+d3.timeFormat('%Y')(val), d3.select("#map-dropdown").select("select").property("value"));
-                that.updateYear(d3.timeFormat('%Y')(val));
+                that.updateYear(val.getFullYear());
             });
 
         var gTime = d3
@@ -129,32 +131,24 @@ class Map {
 
         d3.select('.parameter-value text')
             .classed('slider-label', true)
-            .text(d3.timeFormat('%Y')(sliderTime.value()));
-
-        d3.select("#map-dropdown")
-            .on("change", function () {
-                that.updateHeatMap(+d3.timeFormat('%Y')(sliderTime.value()), d3.select(this).select("select").property("value"), d3.select("#map-sub-dropdown").select("select").property("value"))
-            })
-
-        d3.select("#map-sub-dropdown")
-            .on("change", function () {
-                that.updateHeatMap(+d3.timeFormat('%Y')(sliderTime.value()), d3.select("#map-dropdown").select("select").property("value"), d3.select(this).select("select").property("value"))
-            })
-
-        this.updateHeatMap(+d3.timeFormat('%Y')(sliderTime.value()), d3.select("#map-dropdown").select("select").property("value"))
-
+            .text(sliderTime.value().getFullYear());
     }
 
     /**
      * Updates the heat map for the given year.
      * @param {number} year 
      */
-    updateHeatMap(year, data_type, sub_type = "Total-All") {
+    updateHeatMap(year, data_type, sub_type) {
         let data;
         let interpolateFunc;
+
+        if (sub_type === undefined)
+        {
+            sub_type = "Total-All";
+        }
         
         if (data_type === "hours" && year !== 2018) {
-            d3.select("#map-sub-dropdown").style("opacity", 1);
+            d3.select("#data-sub-dropdown").style("opacity", 1);
             interpolateFunc = d3.interpolateYlOrRd;
             data = new Object();
             data.year = year;
@@ -168,7 +162,7 @@ class Map {
 
             }
         } else if (data_type === "wage") {
-            d3.select("#map-sub-dropdown").style("opacity", 0);
+            d3.select("#data-sub-dropdown").style("opacity", 0);
             interpolateFunc = d3.interpolateYlGn;
             data = new Object()
             data.year = year;
@@ -181,7 +175,7 @@ class Map {
                 });
             }
         } else if (data_type === "none") {
-            d3.select("#map-sub-dropdown").style("opacity", 0);
+            d3.select("#data-sub-dropdown").style("opacity", 0);
             data = new Object();
         } else {
             console.log("No such data.");
@@ -238,7 +232,7 @@ class Map {
                 .data([fed])
                 .join("text")
                     .classed("fed-wage-text", true)
-                    .html("FLSA")
+                    .html("USA")
                     .style("opacity", 1)
                     .transition()
                     .duration(200)
