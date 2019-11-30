@@ -1,6 +1,4 @@
 // Append all svgs so size is dynamic
-d3.select("#synopsis").append("svg").attr("id", "synopsis-svg").attr("width", "100%").attr("height", "35px");
-
 let temp = d3.select("#bigchart").append("svg").attr("id", "main-chart-svg").attr("width", "100%");
 temp.attr("height", (temp.node().getBoundingClientRect().width * 0.6));
 
@@ -23,33 +21,36 @@ var arrowPath = lineGenerator(arrowData);
 
 let midChartArea = d3.select(".grid-switch");
 
-midChartArea.append("svg").attr("width", "30px").attr("height", "30px").attr("id", "arrow1").style("visibility", "hidden")
-.append("path")
-.attr("d", arrowPath)
-.style("fill", "coral")
-.style("stroke", "black")
-.attr("transform", "rotate(105) translate(-6, -40)");
+midChartArea.append("svg").attr("width", "30px").attr("height", "30px")
+	.attr("id", "arrow1")
+	.style("visibility", "hidden")
+	.append("path")
+	.attr("d", arrowPath)
+	.style("fill", "lightsalmon")
+	.style("stroke", "black")
+	.attr("transform", "rotate(105) translate(-6, -40)");
 
 midChartArea.append("text").text("Actual");
 midChartArea.append("label")
-.attr("class", "switch");
+	.attr("class", "switch");
 d3.select(".switch")
-.append("input")
-.attr("id", "toggle-button")
-.attr("type", "checkbox")
-.attr("transform", "translate(0, -100)");
+	.append("input")
+	.attr("id", "toggle-button")
+	.attr("type", "checkbox")
+	.attr("transform", "translate(0, -100)");
 d3.select(".switch")
-.append("span")
-.classed("slider", true)
-.classed("round", true);
+	.append("span")
+	.classed("slider", true)
+	.classed("round", true);
 midChartArea.append("text").text("Normalized");
 
-midChartArea.append("svg").attr("width", "30px").attr("height", "30px").attr("id", "arrow2").style("visibility", "hidden")
-.append("path")
-.attr("d", arrowPath)
-.style("fill", "coral")
-.style("stroke", "black")
-.attr("transform", "rotate(80) translate(3, -30)");
+midChartArea.append("svg").attr("width", "30px").attr("height", "30px").attr("id", "arrow2")
+	.style("visibility", "hidden")
+	.append("path")
+	.attr("d", arrowPath)
+	.style("fill", "coral")
+	.style("stroke", "black")
+	.attr("transform", "rotate(80) translate(3, -30)");
 
 // charts
 var mainChart = new Chart("main-chart", swapChart);
@@ -60,8 +61,8 @@ var map;
 
 // data
 var allData;
-var data_type = "hours";
-var data_sub_type = undefined;
+var map_data_type = "Total-All";
+var chart_data_type = "Total-All";
 var selected_year = 1969;
 var actWageData = [];
 var normWageData = [];
@@ -69,7 +70,7 @@ var normWageData = [];
 // data headers
 var wageHeader = "Minimum Wage";
 var costHeader = "College Cost";
-var hoursHeader = "Hours Worked";
+var hoursHeader = "Hours at Minimum Wage";
 var normalized = false;
 
 let story = new Story();
@@ -82,24 +83,23 @@ d3.csv("data/COL_Data.csv").then(d => {
 d3.select("#toggle-button").on("change", function()
 {
     normalized = d3.select("#toggle-button").property("checked");
-    mainChart.resetChart(mainChart.name, getDataByChartName(mainChart.name), data_sub_type);
-    subChart1.resetChart(subChart1.name, getDataByChartName(subChart1.name), data_sub_type);
-    subChart2.resetChart(subChart2.name, getDataByChartName(subChart2.name), data_sub_type);
+    mainChart.resetChart(mainChart.name, getDataByChartName(mainChart.name), chart_data_type);
+    subChart1.resetChart(subChart1.name, getDataByChartName(subChart1.name), chart_data_type);
+    subChart2.resetChart(subChart2.name, getDataByChartName(subChart2.name), chart_data_type);
 });
 
-d3.select("#data-dropdown").on("change", function()
+d3.select("#map-data-dropdown").on("change", function()
 {
-    data_type = d3.select(this).select("select").property("value");
-    map.updateHeatMap(selected_year, data_type, data_sub_type);
+    map_data_type = d3.select(this).select("select").property("value");
+    map.updateHeatMap(selected_year, map_data_type);
 });
 
-d3.select("#data-sub-dropdown").on("change", function()
+d3.select("#chart-data-dropdown").on("change", function()
 {
-    data_sub_type = d3.select(this).select("select").property("value");
-    map.updateHeatMap(selected_year, data_type, data_sub_type);
-    mainChart.changeDataSubType(data_sub_type);
-    subChart1.changeDataSubType(data_sub_type);
-    subChart2.changeDataSubType(data_sub_type);
+    chart_data_type = d3.select(this).select("select").property("value");
+    mainChart.changeDataSubType(chart_data_type);
+    subChart1.changeDataSubType(chart_data_type);
+    subChart2.changeDataSubType(chart_data_type);
 });
 
 // Callback function for the year slider to ensure charts and story update as the year changes
@@ -109,55 +109,40 @@ function updateYear(year) {
     mainChart.updateYear(year);
     subChart1.updateYear(year);
     subChart2.updateYear(year);
-    map.updateHeatMap(year, data_type, data_sub_type);
+    map.updateHeatMap(year, map_data_type);
 }
 
-function getDataByChartName(chartName)
-{
-    if (chartName === wageHeader)
-    {
+function getDataByChartName(chartName) {
+    if (chartName === wageHeader) {
         return normalized ? normWageData : actWageData;
-    }
-    else if (chartName === costHeader)
-    {
+    } else if (chartName === costHeader) {
         return normalized ? allData.costN : allData.costA;
-    }
-    else if (chartName === hoursHeader)
-    {
+    } else if (chartName === hoursHeader) {
         return allData.hours;
     }
     return null;
 }
 
-function swapChart(chartName)
-{
+function swapChart(chartName) {
     let currentChartName = mainChart.getChartName();
-    if (chartName === currentChartName)
-    {
+    if (chartName === currentChartName) {
         // this is already the main chart
         return;
-    }
-    else if (chartName === subChart1.getChartName())
-    {
+    } else if (chartName === subChart1.getChartName()) {
         // swap main-chart with sub-chart1
-        mainChart.resetChart(chartName, getDataByChartName(chartName), data_sub_type);
-        subChart1.resetChart(currentChartName, getDataByChartName(currentChartName), data_sub_type);
-    }
-    else if (chartName === subChart2.getChartName())
-    {
+        mainChart.resetChart(chartName, getDataByChartName(chartName), chart_data_type);
+        subChart1.resetChart(currentChartName, getDataByChartName(currentChartName), chart_data_type);
+    } else if (chartName === subChart2.getChartName()) {
         // swap main-chart with sub-chart2
-        mainChart.resetChart(chartName, getDataByChartName(chartName), data_sub_type);
-        subChart2.resetChart(currentChartName, getDataByChartName(currentChartName), data_sub_type);
-    }
-    else
-    {
+        mainChart.resetChart(chartName, getDataByChartName(chartName), chart_data_type);
+        subChart2.resetChart(currentChartName, getDataByChartName(currentChartName), chart_data_type);
+    } else {
         // something went wrong, do nothing
         return;
     }
 }
 
-function statesChanged(newStates, lineColors)
-{
+function statesChanged(newStates, lineColors) {
     mainChart.changeStates(newStates, lineColors);
     subChart1.changeStates(newStates, lineColors);
     subChart2.changeStates(newStates, lineColors);
@@ -167,26 +152,24 @@ loadData().then(data => {
     allData = data;
     map = new Map(data, statesChanged, updateYear)
     map.drawMap(data.map);
-    map.updateHeatMap(selected_year, data_type, data_sub_type);
+    map.updateHeatMap(selected_year, map_data_type);
 
     // wrangle wage data
     let inflationscale = data.scale;
-    for (let w of data.wage)
-    {
+    for (let w of data.wage) {
         var points = [];
         var normalizedPoints = [];
-        for (let i = 1968; i < 2019; ++i)
-        {
+        for (let i = 1968; i < 2018; ++i) {
             points.push([i, w[i]]);
-            normalizedPoints.push([i, (inflationscale[2018-1960].Scale/inflationscale[i-1960].Scale) * w[i]]);
+            normalizedPoints.push([i, (inflationscale[2017-1960].Scale/inflationscale[i-1960].Scale) * w[i]]);
         }
         actWageData.push({state:w["State"], data:points});
         normWageData.push({state:w["State"], data:normalizedPoints});
     }
 
-    mainChart.resetChart(hoursHeader, getDataByChartName(hoursHeader), data_sub_type);
-    subChart1.resetChart(costHeader, getDataByChartName(costHeader), data_sub_type);
-    subChart2.resetChart(wageHeader, getDataByChartName(wageHeader), data_sub_type);
+    mainChart.resetChart(hoursHeader, getDataByChartName(hoursHeader), chart_data_type);
+    subChart1.resetChart(costHeader, getDataByChartName(costHeader), chart_data_type);
+    subChart2.resetChart(wageHeader, getDataByChartName(wageHeader), chart_data_type);
 });
 
 async function loadFile(file) {
@@ -205,8 +188,7 @@ async function loadFile(file) {
     return data;
 }
 
-async function loadData()
-{
+async function loadData() {
     let wageData = await loadFile("data/min-wage.csv");
     let wageScale = await loadFile("data/wage-scale.csv");
     let mapData = await d3.json('data/us_states.json');
@@ -228,7 +210,7 @@ function clearStates() {
     console.log(map);
     map.clearMap();
     
-    mainChart.resetChart(hoursHeader, getDataByChartName(hoursHeader), data_sub_type);
-    subChart1.resetChart(costHeader, getDataByChartName(costHeader), data_sub_type);
-    subChart2.resetChart(wageHeader, getDataByChartName(wageHeader), data_sub_type);
+    mainChart.resetChart(hoursHeader, getDataByChartName(hoursHeader), chart_data_type);
+    subChart1.resetChart(costHeader, getDataByChartName(costHeader), chart_data_type);
+    subChart2.resetChart(wageHeader, getDataByChartName(wageHeader), chart_data_type);
 }

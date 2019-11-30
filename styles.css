@@ -3,6 +3,13 @@
     grid-template-columns: 1fr 1fr;
     grid-gap: 10px;
     grid-auto-rows: auto;
+	font-family: Verdana, Geneva, sans-serif;
+}
+
+#notes {
+	grid-column-start: 1;
+	grid-column-end: 3;
+	font-family: "Times New Roman", Times, serif;
 }
 
 #map-grid {
@@ -23,9 +30,6 @@
     display: none;
 }
 
-#bigchart {
-}
-
 .chartInfo {
     grid-template-rows: 30px 1fr  
 }
@@ -37,35 +41,31 @@
     grid-gap: 10px;
 }
 
-#smallchart1 {
-}
-
-#smallchart2 {
-}
-
-.other {
-}
-
 .state {
     fill: white;
 }
 
 .header {
+	font-family: "Impact", sans-serif;
     text-align: center;
-    color: coral;
+    color: orangered;
 }
 
 h1 {
-    font-size: 40px;
+    font-size: 50px;
+	margin-top: 15px;
+	margin-bottom: 15px;
 }
 
 #synopsis {
+	font-family: Verdana, Geneva, sans-serif;
     text-align: center;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 #data-selection {
     text-align: center;
+	margin-top: 20px;
 }
 
 #story {
@@ -86,7 +86,7 @@ h1 {
     font-size: 26px;
 }
 
-a {
+#event-link {
     font-size: 22px;
 }
 
